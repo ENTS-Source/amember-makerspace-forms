@@ -88,11 +88,11 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
 
         if ($userCustomFields->get("waiver_signed")) {
             $fs = $form->addFieldSet()->setLabel(___("Additional Information"));
-            $requiredFields[] = $fs->addAdvCheckbox("waiver_signed")->setLabel(___("Waiver Signed"));
+            $requiredFields[] = $waiverSigned = $fs->addAdvCheckbox("waiver_signed")->setLabel(___("Waiver Signed"));
         } else $waiverSigned = null;
 
         $fs = $form->addFieldSet()->setLabel(___("Interests and Projects"));
-        $textFields[] = $interests = $fs->addMagicSelect("interests")->loadOptions($options)->setLabel(___("Interests\nMore than one may be selected"));
+        $interests = $fs->addMagicSelect("interests")->loadOptions($options)->setLabel(___("Interests\nMore than one may be selected"));
         $textFields[] = $projects = $fs->addTextarea("notes", array("style" => "height: 70px; width: 70%;"))->setLabel(___("Projects / Other Interests"));
 
         $form->addElement("submit", null, array("value" => ___("Add Member")));
