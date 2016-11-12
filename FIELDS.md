@@ -42,4 +42,5 @@ section and navigate to "Configuration" then "Add User Fields".
 * SQL field type: Text (unlimited length string/data)
 * Display Type: CheckBoxes
 * Field Values: 
-    ![SingleOptionCheckbox](http://i.imgur.com/gvPysGC.png)
+
+![SingleOptionCheckbox](http://i.imgur.com/gvPysGC.png)
