@@ -25,6 +25,10 @@ class Am_Plugin_EntsMakerspaceForms extends Am_Plugin
         );
         $usersMenu->addPage($addMemberPage);
     }
+
+    function onGetPermissionsList(Am_Event $event) {
+        $event->addReturn("ENTS: Add Member", 'ents-add-member');
+    }
 }
 
 class AdminEntsAddMemberController extends Am_Mvc_Controller
