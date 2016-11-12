@@ -26,7 +26,8 @@ class Am_Plugin_EntsMakerspaceForms extends Am_Plugin
         $usersMenu->addPage($addMemberPage);
     }
 
-    function onGetPermissionsList(Am_Event $event) {
+    function onGetPermissionsList(Am_Event $event)
+    {
         $event->addReturn("ENTS: Add Member", 'ents-add-member');
     }
 }
@@ -62,38 +63,44 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
         $userCustomFields = $this->getDi()->userTable->customFields();
         $form = new Am_Form();
 
+        $textFields = array();
+        $requiredFields = array();
+
         $fs = $form->addFieldSet()->setLabel(___("Member Information"));
-        $firstName = $fs->addText("firstName")->setLabel(___("First Name"))->addFilter("trim")->addRule("required");
-        $lastName = $fs->addText("lastName")->setLabel(___("Last Name"))->addFilter("trim")->addRule("required");
-        $email = $fs->addText("email")->setLabel(___("Email Address"))->addFilter("trim")->addRule("required");
+        $textFields[] = $requiredFields[] = $firstName = $fs->addText("firstName")->setLabel(___("First Name"));
+        $textFields[] = $requiredFields[] = $lastName = $fs->addText("lastName")->setLabel(___("Last Name"));
+        $textFields[] = $requiredFields[] = $email = $fs->addText("email")->setLabel(___("Email Address"));
 
         if ($userCustomFields->get("fob"))
-            $fobNumber = $fs->addText("fobNumber")->setLabel(___("Fob Number"))->addFilter("trim")->addRule("required");
+            $textFields[] = $requiredFields[] = $fobNumber = $fs->addText("fobNumber")->setLabel(___("Fob Number"));
         else $fobNumber = null;
 
         $fs = $form->addFieldSet()->setLabel(___("Address Verification"));
-        $address = $fs->addText("address")->setLabel(___("Address"))->addFilter("trim")->addRule("required");
-        $city = $fs->addText("city")->setLabel(___("City"))->addFilter("trim")->addRule("required");
-        $province = $fs->addText("province")->setLabel(___("Province"))->addFilter("trim")->addRule("required");
+        $textFields[] = $requiredFields[] = $address = $fs->addText("address")->setLabel(___("Address"));
+        $textFields[] = $requiredFields[] = $city = $fs->addText("city")->setLabel(___("City"));
+        $textFields[] = $requiredFields[] = $province = $fs->addText("province", array("value" => "Alberta"))->setLabel(___("Province"));
         $country = $fs->addSelect('country')->setLabel(___("Country"))->loadOptions($this->getDi()->countryTable->getOptions())->setValue("CA");
-        $postalCode = $fs->addText("postalCode")->setLabel(___("Postal Code"))->addFilter("trim")->addRule("required");
+        $textFields[] = $requiredFields[] = $postalCode = $fs->addText("postalCode")->setLabel(___("Postal Code"));
 
-        if($userCustomFields->get("id_type"))
-            $idType = $fs->addText("idType", array("value" => "Alberta Driver's License"))->setLabel("Photo ID Checked\nA small description of what kind of ID was used to verify the above address and name.")->addFilter("trim")->addRule("required");
+        if ($userCustomFields->get("id_type"))
+            $textFields[] = $requiredFields[] = $idType = $fs->addText("idType", array("value" => "Alberta Driver's License"))->setLabel("Photo ID Checked\nA small description of what kind of ID was used to verify the above address and name.");
         else $idType = null;
 
-        if($userCustomFields->get("waiver_signed")) {
+        if ($userCustomFields->get("waiver_signed")) {
             $fs = $form->addFieldSet()->setLabel(___("Additional Information"));
-            $fs->addAdvCheckbox("waiver_signed")->setLabel(___("Waiver Signed"))->addRule("required");
-        }else $waiverSigned = null;
+            $requiredFields[] = $fs->addAdvCheckbox("waiver_signed")->setLabel(___("Waiver Signed"));
+        } else $waiverSigned = null;
 
         $fs = $form->addFieldSet()->setLabel(___("Interests and Projects"));
-        $interests = $fs->addMagicSelect("interests")->loadOptions($options)->setLabel(___("Interests\nMore than one may be selected"));
-        $projects = $fs->addTextarea("notes", array("style" => "height: 70px; width: 70%;"))->setLabel(___("Projects / Other Interests"));
+        $textFields[] = $interests = $fs->addMagicSelect("interests")->loadOptions($options)->setLabel(___("Interests\nMore than one may be selected"));
+        $textFields[] = $projects = $fs->addTextarea("notes", array("style" => "height: 70px; width: 70%;"))->setLabel(___("Projects / Other Interests"));
 
         $form->addElement("submit", null, array("value" => ___("Add Member")));
 
-        if($form->isSubmitted() && $form->validate()) {
+        foreach ($textFields as $field) $field->addFilter("trim");
+        foreach ($requiredFields as $field) $field->addRule("required");
+
+        if ($form->isSubmitted() && $form->validate()) {
             $notes = htmlspecialchars($projects->getValue());
             $interests = $interests->getValue(); // array
 
@@ -103,7 +110,7 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
                 foreach ($interests as $interest) $noteContent .= "* $interest\n";
                 $noteContent .= "\n\n";
             }
-            if(strlen($notes) > 0) $noteContent .= "Projects / Other Interests:\n$notes";
+            if (strlen($notes) > 0) $noteContent .= "Projects / Other Interests:\n$notes";
 
             $table = $this->getDi()->userTable;
             $user = $table->createRecord();
@@ -116,15 +123,15 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
             $user->state = htmlspecialchars($province->getValue());
             $user->zip = htmlspecialchars($postalCode->getValue());
             $user->country = htmlspecialchars($country->getValue());
-            if($idType) $user->id_type = htmlspecialchars($idType->getvalue());
-            if($fobNumber) $user->fob = htmlspecialchars($fobNumber->getValue());
-            if($waiverSigned) $user->waiver_signed = true;
+            if ($idType) $user->id_type = htmlspecialchars($idType->getvalue());
+            if ($fobNumber) $user->fob = htmlspecialchars($fobNumber->getValue());
+            if ($waiverSigned) $user->waiver_signed = true;
             $user->generateLogin();
             $user->generatePassword();
             $user->insert();
             $user->sendRegistrationEmail();
 
-            if(strlen($noteContent) > 0) {
+            if (strlen($noteContent) > 0) {
                 $table = $this->getDi()->userNoteTable;
                 $note = $table->createRecord();
                 $note->user_id = $user->user_id;
