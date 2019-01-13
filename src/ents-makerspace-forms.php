@@ -86,7 +86,7 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
         $textFields[] = $requiredFields[] = $email = $fs->addText("email")->setLabel(___("Email Address"));
 
         if ($userCustomFields->get("fob"))
-            $textFields[] = $requiredFields[] = $fobNumber = $fs->addText("fobNumber")->setLabel(___("Fob Number"));
+            $textFields[] = $requiredFields[] = $fobNumber = $fs->addText("fobNumber")->setLabel(___("Fob Number\nWithout leading zeros"));
         else $fobNumber = null;
 
         $fs = $form->addFieldSet()->setLabel(___("Address Verification"));
