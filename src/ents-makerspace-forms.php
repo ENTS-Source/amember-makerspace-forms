@@ -92,7 +92,7 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
         $fs = $form->addFieldSet()->setLabel(___("Address Verification"));
         $textFields[] = $requiredFields[] = $address = $fs->addText("address")->setLabel(___("Address"));
         $textFields[] = $requiredFields[] = $city = $fs->addText("city")->setLabel(___("City"));
-        $textFields[] = $requiredFields[] = $province = $fs->addText("province", array("value" => "Alberta"))->setLabel(___("Province"));
+        $textFields[] = $requiredFields[] = $province = $fs->addText("province", array("value" => "AB"))->setLabel(___("Province"));
         $country = $fs->addSelect('country')->setLabel(___("Country"))->loadOptions($this->getDi()->countryTable->getOptions())->setValue("CA");
         $textFields[] = $requiredFields[] = $postalCode = $fs->addText("postalCode")->setLabel(___("Postal Code"));
 
