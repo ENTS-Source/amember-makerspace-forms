@@ -54,11 +54,25 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
             "Pottery",
             "Socialising",
             "Crafting",
-            "Cosplay/Costume Design"
+            "Cosplay/Costume Design",
         );
 
-        $options = array();
-        foreach ($memberInterestOptions as $option) $options[$option] = $option; // convert to key:value pairs for magic select
+        $advertisingOptions = array(
+            "Twitter",
+            "Facebook",
+            "Instagram",
+            "From a friend/colleague",
+            "Web search",
+            "Poster / print media",
+            "K-Days",
+            "Outreach event",
+        );
+
+        $interestOptions = array();
+        foreach ($memberInterestOptions as $option) $interestOptions[$option] = $option; // convert to key:value pairs for magic select
+
+        $adSourceOptiions = array();
+        foreach ($advertisingOptions as $option) $adSourceOptiions[$option] = $option; // convert to key:value pairs for magic select
 
         $userCustomFields = $this->getDi()->userTable->customFields();
         $form = new Am_Form();
@@ -92,8 +106,9 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
         } else $waiverSigned = null;
 
         $fs = $form->addFieldSet()->setLabel(___("Interests and Projects"));
-        $interests = $fs->addMagicSelect("interests")->loadOptions($options)->setLabel(___("Interests\nMore than one may be selected"));
-        $textFields[] = $projects = $fs->addTextarea("notes", array("style" => "height: 70px; width: 70%;"))->setLabel(___("Projects / Other Interests"));
+        $interests = $fs->addMagicSelect("interests")->loadOptions($interestOptions)->setLabel(___("Interests\nMore than one may be selected"));
+        $adSource = $fs->addMagicSelect("ad_source")->loadOptions($adSourceOptiions)->setLabel(___("Where did they hear about us?\nMore than one may be selected"));
+        $textFields[] = $projects = $fs->addTextarea("notes", array("style" => "height: 70px; width: 70%;"))->setLabel(___("Projects / Other"));
 
         $form->addElement("submit", null, array("value" => ___("Add Member")));
 
@@ -103,6 +118,7 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
         if ($form->isSubmitted() && $form->validate()) {
             $notes = htmlspecialchars($projects->getValue());
             $interests = $interests->getValue(); // array
+            $adSource = $adSource->getValue(); // array
 
             $noteContent = "";
             if (count($interests) > 0) {
@@ -110,7 +126,12 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
                 foreach ($interests as $interest) $noteContent .= "* $interest\n";
                 $noteContent .= "\n\n";
             }
-            if (strlen($notes) > 0) $noteContent .= "Projects / Other Interests:\n$notes";
+            if (count($adSource) > 0) {
+                $noteContent .= "Heard about the space from:\n";
+                foreach ($adSource as $source) $noteContent .= "* $source\n";
+                $noteContent .= "\n\n";
+            }
+            if (strlen($notes) > 0) $noteContent .= "Projects / Other:\n$notes";
 
             $table = $this->getDi()->userTable;
             $user = $table->createRecord();
