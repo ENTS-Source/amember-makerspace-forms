@@ -55,17 +55,29 @@ class AdminEntsAddMemberController extends Am_Mvc_Controller
             "Socialising",
             "Crafting",
             "Cosplay/Costume Design",
+            "Silkscreening",
+            "Lapidary",
+            "Glasswork",
+            "Governance",
+            "Sewing/Fabrics",
+            "Gardening",
+            "Volunteering",
         );
 
         $advertisingOptions = array(
             "Twitter",
             "Facebook",
             "Instagram",
+            "Reddit",
             "From a friend/colleague",
+            "From a member",
             "Web search",
             "Poster / print media",
             "K-Days",
             "Outreach event",
+            "Partner organization",
+            "Referral",
+            "Radio",
         );
 
         $interestOptions = array();
